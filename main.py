@@ -4,13 +4,11 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 # Project imports
-from tile import Tile
+from tile_grid import TileGrid
+from grid_world import GridWorld
 
 # Constants
 WINDOW_TITLE = "RL Sandbox"
-
-TILE_W = 6
-TILE_H = 4
 
 class RLWidget(QMainWindow):
 
@@ -21,27 +19,25 @@ class RLWidget(QMainWindow):
     def initUI(self):
         self.setWindowTitle(WINDOW_TITLE)
 
+        # World
+        world = GridWorld()
+        tile_grid = TileGrid(world)
+        self.setCentralWidget(tile_grid)
+
         # Toolbar
         self.toolbar = self.addToolBar("tb1")
 
         run_action = QAction("Run", self)
         self.toolbar.addAction(run_action)
 
+
+        step_action = QAction("Step", self)
+        step_action .triggered.connect(world.step)
+        self.toolbar.addAction(step_action)
+
         exit_action = QAction("Exit", self)
         exit_action.triggered.connect(qApp.quit)
         self.toolbar.addAction(exit_action)
-
-        # Layout
-        tile_area = QWidget()
-        self.setCentralWidget(tile_area)
-
-        grid = QGridLayout()
-        tile_area.setLayout(grid)
-
-        for i in range(TILE_H):
-            for j in range(TILE_W):
-                tile = Tile()
-                grid.addWidget(tile, i, j)
 
         self.show()
 
