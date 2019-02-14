@@ -4,6 +4,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 from constants import *
+from policy import *
 
 class RLMenu(QWidget):
 
@@ -87,6 +88,17 @@ class RLMenu(QWidget):
         step_edit.setValue(DEFAULT_STEP_TIME)
         step_edit.valueChanged.connect(self.set_step_time)
         form.addRow(QLabel("Step Time (ms)"), step_edit)
+
+        policy_box = QVBoxLayout()
+        random_radio = QRadioButton("Random")
+        random_radio.toggle()
+        greedy_radio = QRadioButton("Greedy")
+        random_radio.toggled.connect((lambda: self.grid_world.set_policy(random_policy)))
+        greedy_radio.toggled.connect((lambda: self.grid_world.set_policy(greedy_policy)))
+
+        policy_box.addWidget(random_radio)
+        policy_box.addWidget(greedy_radio)
+        form.addRow(QLabel("Policy"), policy_box)
 
         single_button = QPushButton("Take Single Step")
         single_button.clicked.connect(self.grid_world.step)

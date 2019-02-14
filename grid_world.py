@@ -1,10 +1,7 @@
 import numpy as np
-import random
 
-from constants import  *
-
-def random_policy(grid_world):
-    return random.randint(0, 3)
+from constants import *
+from policy import *
 
 class GridWorld():
     def __init__(self, height, width):
@@ -39,29 +36,37 @@ class GridWorld():
 
         [old_y, old_x] = self.agent_pos
 
-        if self.train:
-            # Q-learning
-            old_val = self.q[old_y, old_x, action_i]
-            old_reward = self.reward[old_y, old_x]
-            learned_val = old_reward + self.discount*self.value[new_y, new_x]
-            self.q[old_y, old_x] = (1 - self.learning_rate)*old_val +\
-                self.learning_rate*learned_val
-
-            # Update value
-            self.value[old_y, old_x] = self.q[old_y, old_x].max()
-
-        # Update position
-        self.agent_pos = [new_y, new_x]
+        moved = (old_y != new_y) or (old_x != new_x)
+        old_reward = self.reward[old_y, old_x]
 
         # Reset if episodic and reward
         if self.episodic and (old_reward != 0):
             self.agent_pos = self.start_pos
+
+            self.value[old_y, old_x] = self.reward[old_y, old_x]
+
+        elif moved:
+            if self.train:
+                # Q-learning
+                old_q = self.q[old_y, old_x, action_i]
+                learned_val = old_reward + self.discount*self.value[new_y, new_x]
+                self.q[old_y, old_x, action_i] = (1 - self.learning_rate)*old_q +\
+                    self.learning_rate*learned_val
+
+                # Update value
+                self.value[old_y, old_x] = self.q[old_y, old_x].max()
+
+            # Update position
+            self.agent_pos = [new_y, new_x]
 
         self.update()
 
     def reset_position(self):
         self.agent_pos = self.start_pos
         self.update()
+
+    def set_policy(self, new_policy):
+        self.policy = new_policy
 
     def set_train(self, train):
         self.train = train
