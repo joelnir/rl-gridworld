@@ -1,0 +1,35 @@
+# Constants
+
+# Graphics
+WINDOW_TITLE = "RL Sandbox"
+
+MENU_WIDTH = 200
+
+DECIMALS = 4
+
+AGENT_HEIGHT = 70
+AGENT_PIC = "robot.png"
+
+# World
+DEFAULT_W = 4
+DEFAULT_H = 6
+
+MAX_TILES = 100
+
+DEFAULT_START = [0,0]
+
+ACTIONS = [(-1, 0), (0,1), (1,0), (0, -1)] # Actions: Up, Right, Down, Left
+
+# Learning
+DEFAULT_LR = 0.1
+DEFAULT_DISCOUNT = 0.5
+
+MAX_REWARD = 100
+MIN_REWARD = -100
+
+MIN_TRAIN_STEP = 1
+MAX_TRAIN_STEP = 10000
+DEFAULT_STEP_TIME = 10
+
+DEFAULT_EPISODIC = False
+DEFAULT_TRAIN = True

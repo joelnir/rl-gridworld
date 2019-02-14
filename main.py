@@ -6,38 +6,32 @@ from PyQt5.QtGui import *
 # Project imports
 from tile_grid import TileGrid
 from grid_world import GridWorld
-
-# Constants
-WINDOW_TITLE = "RL Sandbox"
+from rl_menu import RLMenu
+from constants import *
 
 class RLWidget(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.initUI()
+        self.init_ui(DEFAULT_H, DEFAULT_W)
 
-    def initUI(self):
+    def init_ui(self, height, width):
         self.setWindowTitle(WINDOW_TITLE)
 
+        component_layout = QGridLayout()
+        central_widget = QWidget()
+        central_widget.setLayout(component_layout)
+        self.setCentralWidget(central_widget)
+
         # World
-        world = GridWorld()
-        tile_grid = TileGrid(world)
-        self.setCentralWidget(tile_grid)
+        grid_world = GridWorld(height, width)
+        tile_grid = TileGrid(grid_world)
+        component_layout.addWidget(tile_grid, 0,1,1,3)
 
-        # Toolbar
-        self.toolbar = self.addToolBar("tb1")
-
-        run_action = QAction("Run", self)
-        self.toolbar.addAction(run_action)
-
-
-        step_action = QAction("Step", self)
-        step_action .triggered.connect(world.step)
-        self.toolbar.addAction(step_action)
-
-        exit_action = QAction("Exit", self)
-        exit_action.triggered.connect(qApp.quit)
-        self.toolbar.addAction(exit_action)
+        # Menu
+        menu = RLMenu(grid_world, (lambda h, w, f=self.init_ui: f(h,w)))
+        menu.setFixedSize(MENU_WIDTH, QWIDGETSIZE_MAX)
+        component_layout.addWidget(menu,0,0,1,1)
 
         self.show()
 
