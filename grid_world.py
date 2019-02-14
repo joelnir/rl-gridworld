@@ -24,6 +24,8 @@ class GridWorld():
         self.episodic = DEFAULT_EPISODIC
         self.train = DEFAULT_TRAIN
 
+        self.epsilon = DEFAULT_EPSILON # Epsilon for epsilon-greedy policies
+
         # List of observers
         self.observers = []
 
@@ -77,6 +79,9 @@ class GridWorld():
 
     def set_policy(self, new_policy):
         self.policy = new_policy
+
+    def set_epsilon(self, new_eps):
+        self.epsilon = new_eps
 
     def set_placing(self, placing):
         self.placing = placing

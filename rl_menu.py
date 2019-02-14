@@ -46,6 +46,8 @@ class RLMenu(QWidget):
         place_button.clicked.connect((lambda x: self.grid_world.set_placing(True)))
         form.addRow(place_button)
 
+        form.addRow(QLabel("<h2>Learning</h2>"))
+
         episode_box = QCheckBox()
         if DEFAULT_EPISODIC:
             episode_box.setCheckState(Qt.Checked)
@@ -61,20 +63,6 @@ class RLMenu(QWidget):
         df_edit.valueChanged.connect(self.grid_world.set_discount)
         form.addRow(QLabel("Discount Factor"), df_edit)
 
-        # Training
-        form.addRow(QLabel("<h2>Actions</h2>"))
-
-        reset_pos_button = QPushButton("Reset Position")
-        reset_pos_button.clicked.connect(self.grid_world.reset_position)
-        form.addRow(reset_pos_button)
-
-        train_box = QCheckBox()
-        if DEFAULT_TRAIN:
-            train_box.setCheckState(Qt.Checked)
-        train_box.stateChanged.connect(
-                (lambda s: self.grid_world.set_train((s == Qt.Checked))))
-        form.addRow(QLabel("Train"), train_box)
-
         lr_edit = QDoubleSpinBox()
         lr_edit.setRange(0.0, 1.0)
         lr_edit.setSingleStep(0.1)
@@ -83,22 +71,49 @@ class RLMenu(QWidget):
         lr_edit.valueChanged.connect(self.grid_world.set_learning_rate)
         form.addRow(QLabel("Learning Rate"), lr_edit)
 
+        form.addRow(QLabel("<h2>Policy</h2>"))
+
+        random_radio = QRadioButton("Random")
+        random_radio.toggle()
+        random_radio.toggled.connect((lambda: self.grid_world.set_policy(random_policy)))
+        form.addRow(random_radio)
+
+        greedy_radio = QRadioButton("Greedy")
+        greedy_radio.toggled.connect((lambda: self.grid_world.set_policy(greedy_policy)))
+        form.addRow(greedy_radio)
+
+        eps_radio = QRadioButton(u'\u03B5-Greedy')
+        greedy_radio.toggled.connect(
+                (lambda: self.grid_world.set_policy(eps_greedy_policy)))
+        form.addRow(eps_radio)
+
+        eps_edit = QDoubleSpinBox()
+        eps_edit.setRange(0.0, 1.0)
+        eps_edit.setValue(DEFAULT_EPSILON)
+        eps_edit.setSingleStep(0.1)
+        eps_edit.setDecimals(DECIMALS)
+        eps_edit.valueChanged.connect(self.grid_world.set_epsilon)
+        form.addRow(QLabel(u'\u03B5'), eps_edit)
+
+        form.addRow(QLabel("<h2>Actions</h2>"))
+
+        train_box = QCheckBox()
+        if DEFAULT_TRAIN:
+            train_box.setCheckState(Qt.Checked)
+        train_box.stateChanged.connect(
+                (lambda s: self.grid_world.set_train((s == Qt.Checked))))
+        form.addRow(QLabel("Train"), train_box)
+
         step_edit = QSpinBox()
         step_edit.setRange(MIN_TRAIN_STEP, MAX_TRAIN_STEP)
         step_edit.setValue(DEFAULT_STEP_TIME)
         step_edit.valueChanged.connect(self.set_step_time)
         form.addRow(QLabel("Step Time (ms)"), step_edit)
 
-        policy_box = QVBoxLayout()
-        random_radio = QRadioButton("Random")
-        random_radio.toggle()
-        greedy_radio = QRadioButton("Greedy")
-        random_radio.toggled.connect((lambda: self.grid_world.set_policy(random_policy)))
-        greedy_radio.toggled.connect((lambda: self.grid_world.set_policy(greedy_policy)))
+        reset_pos_button = QPushButton("Reset Position")
+        reset_pos_button.clicked.connect(self.grid_world.reset_position)
+        form.addRow(reset_pos_button)
 
-        policy_box.addWidget(random_radio)
-        policy_box.addWidget(greedy_radio)
-        form.addRow(QLabel("Policy"), policy_box)
 
         single_button = QPushButton("Take Single Step")
         single_button.clicked.connect(self.grid_world.step)
