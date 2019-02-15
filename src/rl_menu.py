@@ -83,7 +83,7 @@ class RLMenu(QWidget):
         form.addRow(greedy_radio)
 
         eps_radio = QRadioButton(u'\u03B5-Greedy')
-        greedy_radio.toggled.connect(
+        eps_radio.toggled.connect(
                 (lambda: self.grid_world.set_policy(eps_greedy_policy)))
         form.addRow(eps_radio)
 
