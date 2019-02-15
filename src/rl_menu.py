@@ -2,6 +2,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+import random
 
 from constants import *
 from policy import *
@@ -129,15 +130,64 @@ class RLMenu(QWidget):
         self.run_button = run_button
         self.stop_button = stop_button
 
+        form.addRow(QLabel("<h2>Patterns</h2>"))
+        rand_button = QPushButton("3 Random Rewards")
+        rand_button.clicked.connect((lambda: self.set_random_reward(3)))
+        form.addRow(rand_button)
+
+        maze_button = QPushButton("Maze")
+        maze_button.clicked.connect(self.set_maze_reward)
+        form.addRow(maze_button)
+
         # Exit
+        form.addRow(QLabel("<br>"))
         exit_button = QPushButton("Exit")
         exit_button.clicked.connect(qApp.quit)
         form.addRow(exit_button)
+
+    def set_maze_reward(self):
+        [height, width] = self.grid_world.get_size()
+
+        # End reward
+        self.grid_world.update_reward(MAX_REWARD, height-1, width-1)
+
+        agent_x = self.grid_world.get_position()[1]
+
+        bottom_col = True
+        bottom_range = range(1,height)
+        top_range = range(0, height-1)
+
+        for c in range(width-2, agent_x, - 2):
+            if bottom_col:
+                loss_range = bottom_range
+                bottom_col = False
+            else:
+                loss_range = top_range
+                bottom_col = True
+
+            # Set negative rewards
+            for y in loss_range:
+                self.grid_world.update_reward(-1, y, c)
+
+    def set_random_reward(self, count):
+        size = self.grid_world.get_size()
+        entries = size[0]*size[1]
+
+        tiles = np.random.choice(entries, count)
+
+        for tile in tiles:
+            y = tile//size[0]
+            x = tile%size[1]
+            rew = random.uniform(0, MAX_REWARD)
+
+            self.grid_world.update_reward(rew, y, x)
+
 
     def set_step_time(self, time):
         self.step_time = time
 
     def reset_grid(self):
+        self.stop()
         width = self.w_box.value()
         height = self.h_box.value()
 
